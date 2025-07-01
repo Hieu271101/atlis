@@ -1,0 +1,52 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:13
+    container_name: atlassian-db
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: yourpassword
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+    ports:
+      - "5432:5432"
+    networks:
+      - atlassian_net
+
+  jira:
+    build:
+      context: .
+      dockerfile: Dockerfile.jira
+    container_name: jira-app
+    depends_on:
+      - postgres
+    ports:
+      - "8080:8080"
+    volumes:
+      - jiraVolume:/var/atlassian/application-data/jira
+    networks:
+      - atlassian_net
+
+  confluence:
+    build:
+      context: .
+      dockerfile: Dockerfile.confluence
+    container_name: confluence-app
+    depends_on:
+      - postgres
+    ports:
+      - "8090:8090"
+    volumes:
+      - confluenceVolume:/var/atlassian/application-data/confluence
+    networks:
+      - atlassian_net
+
+volumes:
+  pgdata:
+  jiraVolume:
+  confluenceVolume:
+
+networks:
+  atlassian_net:
