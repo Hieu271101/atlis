@@ -29,6 +29,20 @@ services:
     networks:
       - atlassian_net
 
+  jiracore:
+    build:
+      context: .
+      dockerfile: Dockerfile.jiracore
+    container_name: jiracore-app
+    depends_on:
+      - postgres
+    ports:
+      - "8081:8080"  # tránh trùng với Jira Software
+    volumes:
+      - jiracoreVolume:/var/atlassian/application-data/jira
+    networks:
+      - atlassian_net
+
   confluence:
     build:
       context: .
@@ -46,6 +60,7 @@ services:
 volumes:
   pgdata:
   jiraVolume:
+  jiracoreVolume:
   confluenceVolume:
 
 networks:
